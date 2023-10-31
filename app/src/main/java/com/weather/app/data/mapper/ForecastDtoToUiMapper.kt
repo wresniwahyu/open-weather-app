@@ -26,7 +26,7 @@ class ForecastDtoToUiMapper @Inject constructor(
                 ForecastItemUiModel(
                     dt = it.dt ?: 0,
                     dtTxt = it.dtTxt.orEmpty(),
-                    weather = weatherDetailMapper.map(it.weather),
+                    weather = weatherDetailMapper.map(it.weather?.firstOrNull()),
                     main = weatherMainMapper.map(it.main),
                     wind = weatherWindMapper.map(it.wind)
                 )

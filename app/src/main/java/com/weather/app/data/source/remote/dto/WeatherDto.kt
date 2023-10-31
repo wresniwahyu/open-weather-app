@@ -12,7 +12,7 @@ data class WeatherDto(
     @SerializedName("coord")
     val coord: WeatherCoordDto? = null,
     @SerializedName("weather")
-    val weatherDetail: WeatherDetailDto? = null,
+    val weatherDetail: List<WeatherDetailDto>? = null,
     @SerializedName("main")
     val main: WeatherMainDto? = null,
     @SerializedName("wind")

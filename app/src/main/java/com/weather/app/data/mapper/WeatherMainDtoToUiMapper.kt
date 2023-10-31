@@ -9,7 +9,9 @@ class WeatherMainDtoToUiMapper @Inject constructor() : Mapper<WeatherMainDto?, W
     override fun map(input: WeatherMainDto?): WeatherMainUiModel {
         return WeatherMainUiModel(
             temp = input?.temp ?: 0.0,
-            humidity = input?.humidity ?: 0
+            humidity = input?.humidity ?: 0,
+            tempMin = input?.tempMin ?: 0.0,
+            tempMax = input?.tempMax ?: 0.0
         )
     }
 }

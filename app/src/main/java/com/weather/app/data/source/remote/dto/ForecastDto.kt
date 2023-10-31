@@ -22,7 +22,7 @@ data class ForecastItemDto(
     @SerializedName("dt_txt")
     val dtTxt: String? = null,
     @SerializedName("weather")
-    val weather: WeatherDetailDto? = null,
+    val weather: List<WeatherDetailDto>? = null,
     @SerializedName("main")
     val main: WeatherMainDto? = null,
     @SerializedName("wind")

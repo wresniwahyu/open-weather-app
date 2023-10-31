@@ -26,7 +26,7 @@ class WeatherDtoToUiMapper @Inject constructor(
                 lat = input.coord?.lat ?: 0.0,
                 lon = input.coord?.lon ?: 0.0,
             ),
-            weatherDetail = weatherDetailMapper.map(input.weatherDetail),
+            weatherDetail = weatherDetailMapper.map(input.weatherDetail?.firstOrNull()),
             main = weatherMainMapper.map(input.main),
             wind = weatherWindMapper.map(input.wind)
         )

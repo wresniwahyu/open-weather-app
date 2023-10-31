@@ -29,9 +29,13 @@ class WeatherRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getForecastData(cityName: String): ApiResult<ForecastUiModel> {
+    override suspend fun getForecastData(
+        lat: Double?,
+        lon: Double?,
+        cityName: String?
+    ): ApiResult<ForecastUiModel> {
         return handleApi(forecastMapper) {
-            apiService.getForecastData(cityName = cityName)
+            apiService.getForecastData(cityName = cityName, lat = lat, lon = lon)
         }
     }
 }

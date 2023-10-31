@@ -11,7 +11,9 @@ interface WeatherRepository {
     ): ApiResult<WeatherUiModel>
 
     suspend fun getForecastData(
-        cityName: String
+        lat: Double? = null,
+        lon: Double? = null,
+        cityName: String? = null
     ): ApiResult<ForecastUiModel>
 
 }
