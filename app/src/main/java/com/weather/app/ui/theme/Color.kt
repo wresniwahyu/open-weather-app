@@ -11,4 +11,4 @@ val PurpleGrey40 = Color(0xFF1976D2)
 val Pink40 = Color(0xFF0D47A1)
 
 val IconColor = Color(0xFF5C5C5C)
-val ButtonEnableColor = Color(0xFF4291CF)
+val ButtonFillColor = Color(0xFF4291CF)

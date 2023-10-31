@@ -21,34 +21,62 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.weather.app.R
 import com.weather.app.ui.component.AppButton
+import com.weather.app.ui.component.EmptyState
 import com.weather.app.ui.component.FavoritesBs
 import com.weather.app.ui.component.ForecastBs
 import com.weather.app.ui.component.ForecastGroupItem
 import com.weather.app.ui.component.SearchBar
+import com.weather.app.util.isNetworkAvailable
+import com.weather.app.util.showToast
 
 @Composable
 fun HomeWeatherScreen(
-    modifier: Modifier = Modifier,
     viewModel: HomeWeatherViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    var showNetworkNotAvailable by remember { mutableStateOf(false) }
+    var searchValue by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = Unit, block = {
         viewModel.event.collect { event ->
             when (event) {
                 is HomeWeatherViewModel.Event.ShowError -> {
-//                    context.showToast(context.getString(R.string.error_message))
+                    context.showToast(context.getString(R.string.error_message))
                 }
             }
         }
     })
 
-    HomeWeatherContent(viewModel = viewModel)
+    Column {
+        SearchBar(callback = {
+            searchValue = it
+            viewModel.searchByName(it)
+            showNetworkNotAvailable = context.isNetworkAvailable().not()
+        })
+
+        if (showNetworkNotAvailable) {
+            EmptyState(
+                text = stringResource(R.string.message_network_unavailable),
+                buttonText = stringResource(R.string.btn_try_again)
+            ) {
+                if (searchValue.isNotBlank()) {
+                    viewModel.searchByName(searchValue)
+                }
+                showNetworkNotAvailable = false
+            }
+        } else {
+            if (state.data.cityName.isNotBlank()) {
+                HomeWeatherContent(viewModel = viewModel)
+            } else {
+                EmptyState(text = stringResource(R.string.message_search_city))
+            }
+        }
+    }
 }
 
 @Composable
@@ -84,8 +112,6 @@ fun HomeWeatherContent(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SearchBar(callback = {})
-
         Text(
             text = state.data.cityName,
             style = MaterialTheme.typography.headlineMedium
@@ -117,7 +143,7 @@ fun HomeWeatherContent(
                 buttonText = stringResource(
                     if (state.isFavorite) R.string.btn_saved else R.string.btn_save
                 ),
-                isActive = state.isFavorite
+                isOutlinedButton = state.isFavorite
             ) {
                 viewModel.addToFavorite(state.data.id, state.data.cityName)
             }
@@ -125,13 +151,13 @@ fun HomeWeatherContent(
             AppButton(
                 modifier = Modifier.weight(1f),
                 buttonText = stringResource(R.string.btn_favorites),
-                isActive = false
+                isOutlinedButton = false
             ) {
                 showFavoritesBs = true
             }
             Spacer(modifier = Modifier.width(16.dp))
         }
-
+        Spacer(modifier = Modifier.width(16.dp))
         LazyColumn {
             items(state.groupedForecasts) {
                 ForecastGroupItem(
@@ -145,10 +171,4 @@ fun HomeWeatherContent(
         }
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeWeatherPrev() {
-    HomeWeatherScreen()
 }

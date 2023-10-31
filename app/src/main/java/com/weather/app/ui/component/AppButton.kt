@@ -10,18 +10,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.weather.app.ui.theme.ButtonEnableColor
+import com.weather.app.ui.theme.ButtonFillColor
 
 @Composable
 fun AppButton(
     modifier: Modifier = Modifier,
     buttonText: String,
-    isActive: Boolean = false,
+    isOutlinedButton: Boolean = false,
     onButtonClick: () -> Unit = {}
 ) {
-    val containerColor = if (isActive) Color.Transparent else ButtonEnableColor
-    val contentColor = if (isActive) Color.Black else Color.White
-    val border = if (isActive) BorderStroke(1.dp, Color.Black) else null
+    val containerColor = if (isOutlinedButton) Color.Transparent else ButtonFillColor
+    val contentColor = if (isOutlinedButton) ButtonFillColor else Color.White
+    val border = if (isOutlinedButton) BorderStroke(1.dp, ButtonFillColor) else null
 
     Button(
         modifier = modifier.defaultMinSize(minWidth = 150.dp),

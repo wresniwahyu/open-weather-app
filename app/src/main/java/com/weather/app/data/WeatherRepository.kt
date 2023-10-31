@@ -8,14 +8,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
     suspend fun getWeatherData(
-        lat: Double,
-        lon: Double
+        cityName: String
     ): ApiResult<WeatherUiModel>
 
     suspend fun getForecastData(
-        lat: Double? = null,
-        lon: Double? = null,
-        cityName: String? = null
+        cityName: String
     ): ApiResult<ForecastUiModel>
 
     suspend fun insertFavorite(

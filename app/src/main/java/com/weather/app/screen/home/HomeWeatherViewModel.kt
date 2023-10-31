@@ -14,6 +14,8 @@ import com.weather.app.util.onError
 import com.weather.app.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
@@ -32,17 +34,24 @@ class HomeWeatherViewModel @Inject constructor(
     private val _event = MutableSharedFlow<Event>()
     val event = _event.asSharedFlow()
 
-    init {
-        getWeatherData()
-        getForecastData()
-        getFavorites()
+    private var searchJob: Job? = null
+
+    fun searchByName(name: String) {
+        viewModelScope.launch {
+            searchJob?.cancel()
+            searchJob = viewModelScope.launch {
+                delay(1000)
+                getWeatherData(name = name)
+                getForecastData(name = name)
+                getFavorites()
+            }
+        }
     }
 
-    private fun getWeatherData() {
+    private fun getWeatherData(name: String) {
         viewModelScope.launch {
             repository.getWeatherData(
-                lat = -7.795580, // TODO(www): remove hardcoded lat lon
-                lon = 110.369492
+                cityName = name
             ).onSuccess {
                 _state.update { state ->
                     state.copy(
@@ -62,12 +71,9 @@ class HomeWeatherViewModel @Inject constructor(
         }
     }
 
-    private fun getForecastData() {
+    private fun getForecastData(name: String) {
         viewModelScope.launch {
-            repository.getForecastData(
-                lat = -7.795580,
-                lon = 110.369492
-            ).onSuccess {
+            repository.getForecastData(cityName = name).onSuccess {
                 _state.update { state ->
                     state.copy(
                         groupedForecasts = it.list.groupByDate()

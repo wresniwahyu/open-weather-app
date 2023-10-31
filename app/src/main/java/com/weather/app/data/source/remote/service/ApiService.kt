@@ -20,18 +20,14 @@ interface ApiService {
 
     @GET(WEATHER)
     suspend fun getWeatherData(
-        @Query("q") cityName: String? = null,
-        @Query("lat") lat: Double? = null,
-        @Query("lon") lon: Double? = null,
+        @Query("q") cityName: String,
         @Query("units") unit: String = QUERY_UNIT_METRIC,
         @Query("appid") appId: String = BuildConfig.API_KEY
     ): Response<WeatherDto>
 
     @GET(FORECAST)
     suspend fun getForecastData(
-        @Query("q") cityName: String? = null,
-        @Query("lat") lat: Double? = null,
-        @Query("lon") lon: Double? = null,
+        @Query("q") cityName: String,
         @Query("units") unit: String = QUERY_UNIT_METRIC,
         @Query("appid") appId: String = BuildConfig.API_KEY
     ): Response<ForecastDto>

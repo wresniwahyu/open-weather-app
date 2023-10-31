@@ -28,22 +28,15 @@ class WeatherRepositoryImpl @Inject constructor(
     private val favoriteMapper: Mapper<List<@JvmSuppressWildcards FavoriteWeatherEntity>, List<@JvmSuppressWildcards FavoriteWeatherUiModel>>
 ) : WeatherRepository {
 
-    override suspend fun getWeatherData(
-        lat: Double,
-        lon: Double
-    ): ApiResult<WeatherUiModel> {
+    override suspend fun getWeatherData(cityName: String): ApiResult<WeatherUiModel> {
         return handleApi(weatherMapper) {
-            apiService.getWeatherData(lat = lat, lon = lon)
+            apiService.getWeatherData(cityName = cityName)
         }
     }
 
-    override suspend fun getForecastData(
-        lat: Double?,
-        lon: Double?,
-        cityName: String?
-    ): ApiResult<ForecastUiModel> {
+    override suspend fun getForecastData(cityName: String): ApiResult<ForecastUiModel> {
         return handleApi(forecastMapper) {
-            apiService.getForecastData(cityName = cityName, lat = lat, lon = lon)
+            apiService.getForecastData(cityName = cityName)
         }
     }
 
