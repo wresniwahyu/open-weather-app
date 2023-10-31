@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Weather</string>
     <string name="search">Search</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_saved">Saved</string>
+    <string name="btn_favorites">Favorites</string>
 </resources>

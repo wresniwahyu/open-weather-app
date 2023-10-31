@@ -20,10 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.weather.app.R
 import com.weather.app.ui.component.AppButton
+import com.weather.app.ui.component.FavoritesBs
 import com.weather.app.ui.component.ForecastBs
 import com.weather.app.ui.component.ForecastGroupItem
 import com.weather.app.ui.component.SearchBar
@@ -55,6 +58,7 @@ fun HomeWeatherContent(
 ) {
     val state by viewModel.state.collectAsState()
     var showForecastBs by remember { mutableStateOf(false) }
+    var showFavoritesBs by remember { mutableStateOf(false) }
 
     if (showForecastBs) {
         ForecastBs(
@@ -63,6 +67,17 @@ fun HomeWeatherContent(
                 showForecastBs = false
             }
         )
+    }
+
+    if (showFavoritesBs) {
+        FavoritesBs(
+            items = state.favorites,
+            onItemClicked = {
+                // do something
+            },
+            onDismiss = {
+                showFavoritesBs = false
+            })
     }
 
     Column(
@@ -99,18 +114,20 @@ fun HomeWeatherContent(
             Spacer(modifier = Modifier.width(16.dp))
             AppButton(
                 modifier = Modifier.weight(1f),
-                buttonText = "Save",
-                isActive = false
+                buttonText = stringResource(
+                    if (state.isFavorite) R.string.btn_saved else R.string.btn_save
+                ),
+                isActive = state.isFavorite
             ) {
-                // do something
+                viewModel.addToFavorite(state.data.id, state.data.cityName)
             }
             Spacer(modifier = Modifier.width(16.dp))
             AppButton(
                 modifier = Modifier.weight(1f),
-                buttonText = "Favorites",
+                buttonText = stringResource(R.string.btn_favorites),
                 isActive = false
             ) {
-                // do something
+                showFavoritesBs = true
             }
             Spacer(modifier = Modifier.width(16.dp))
         }

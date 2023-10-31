@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.weather.app.base.BaseViewModel
 import com.weather.app.data.WeatherRepository
+import com.weather.app.data.model.FavoriteWeatherUiModel
 import com.weather.app.data.model.ForecastItemUiModel
 import com.weather.app.di.IoDispatcher
 import com.weather.app.ui.component.ForecastGroupItemData
@@ -15,6 +16,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,17 +35,19 @@ class HomeWeatherViewModel @Inject constructor(
     init {
         getWeatherData()
         getForecastData()
+        getFavorites()
     }
 
     private fun getWeatherData() {
         viewModelScope.launch {
             repository.getWeatherData(
-                lat = -7.795580,
+                lat = -7.795580, // TODO(www): remove hardcoded lat lon
                 lon = 110.369492
             ).onSuccess {
                 _state.update { state ->
                     state.copy(
                         data = HomeWeatherScreenData(
+                            id = it.id,
                             cityName = it.name,
                             temp = it.main.temp,
                             tempMin = it.main.tempMin,
@@ -104,8 +109,41 @@ class HomeWeatherViewModel @Inject constructor(
         }
     }
 
+    fun addToFavorite(id: Int, name: String) {
+        viewModelScope.launch {
+            if (_state.value.isFavorite) {
+                repository.deleteFavorite(id, name)
+            } else {
+                repository.insertFavorite(id, name)
+            }
+            getFavorites()
+        }
+    }
+
+    private fun getFavorites() {
+        viewModelScope.launch {
+            repository.getFavorites()
+                .catch {
+                    // do something
+                }
+                .collectLatest {
+                    _state.update { state ->
+                        state.copy(
+                            favorites = it,
+                            isFavorite = it.checkIsFavorite(_state.value.data.id)
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun List<FavoriteWeatherUiModel>.checkIsFavorite(id: Int): Boolean {
+        return this.firstOrNull { it.id == id } != null
+    }
+
     override fun defaultState() = State(
         data = HomeWeatherScreenData(
+            id = 0,
             cityName = "",
             temp = 0.0,
             tempMin = 0.0,
@@ -116,7 +154,8 @@ class HomeWeatherViewModel @Inject constructor(
         ),
         isFavorite = false,
         groupedForecasts = listOf(),
-        selectedForecastGroupItems = listOf()
+        selectedForecastGroupItems = listOf(),
+        favorites = listOf()
     )
 
     override fun onEvent(event: Event) {
@@ -131,7 +170,8 @@ class HomeWeatherViewModel @Inject constructor(
         val data: HomeWeatherScreenData,
         val isFavorite: Boolean,
         val groupedForecasts: List<HomeGroupedForecastData>,
-        val selectedForecastGroupItems: List<ForecastItemData>
+        val selectedForecastGroupItems: List<ForecastItemData>,
+        val favorites: List<FavoriteWeatherUiModel>
     )
 
     sealed class Event {

@@ -4,6 +4,7 @@ import com.weather.app.ui.component.ForecastGroupItemData
 import com.weather.app.ui.component.ForecastItemData
 
 data class HomeWeatherScreenData(
+    val id: Int,
     val cityName: String,
     val temp: Double,
     val tempMin: Double,
