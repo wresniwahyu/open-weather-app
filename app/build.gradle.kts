@@ -28,8 +28,8 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
 
-        buildConfigField("String", "BASE_URL", "\"https://api.openweathermap.org/data/\"")
-        buildConfigField("String", "API_KEY", "f5d63f2b5578b4251164cacda571defa")
+        buildConfigField("String", "BASE_URL", "\"https://api.openweathermap.org/\"")
+        buildConfigField("String", "API_KEY", "\"f5d63f2b5578b4251164cacda571defa\"")
     }
 
     buildTypes {
