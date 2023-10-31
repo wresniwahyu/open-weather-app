@@ -25,6 +25,29 @@ interface Mapper<I, O> {
     fun map(input: I): O
 }
 
+suspend fun <T : Any> handleApi(
+    execute: suspend () -> Response<T>
+): ApiResult<T> {
+    var error: Error? = null
+    return try {
+        val response = execute()
+        val body = response.body()
+        if (response.isSuccessful && body != null) {
+            ApiSuccess(body)
+        } else {
+            val errorBody = response.errorBody()?.string()
+            if (errorBody != null) {
+                error = errorBody.fromJson(Error::class.java)
+            }
+            ApiError(code = response.code(), message = error?.message, error = error)
+        }
+    } catch (e: HttpException) {
+        ApiError(code = e.code(), message = e.message())
+    } catch (e: Throwable) {
+        ApiError(throwable = e)
+    }
+}
+
 @Suppress("UNCHECKED_CAST")
 suspend fun <T : Any, R : Any> handleApi(
     mapper: Mapper<T, R>,
