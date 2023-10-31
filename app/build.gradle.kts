@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -94,6 +95,9 @@ dependencies {
     implementation(libs.squareup.retrofit.converter.gson)
     implementation(libs.squareup.okhttp)
     implementation(libs.squareup.okhttp.logging)
+
+    // coil
+    implementation(libs.coil.compose)
 
     // Debug Tools: Chucker
     debugImplementation(libs.chucker.debug)
