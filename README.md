@@ -6,6 +6,9 @@
 - [Libraries](#libraries)
 
 ## ScreenShots
+| Weather & Forecast  | Daily Forecast | Favorites | 
+| ------------- | ------------- | ------------- |
+| ![1](https://github.com/wresniwahyu/open-weather-app/assets/43021166/e4a3a4f0-fb42-4c30-afcc-9bbd91352456)  | ![3](https://github.com/wresniwahyu/open-weather-app/assets/43021166/5612d6cc-1466-43b8-a644-6a4dbc46ef63)  | ![2](https://github.com/wresniwahyu/open-weather-app/assets/43021166/1ceefa50-2a23-4c92-8bd9-5b820e2e6e1d)  |
 
 ## Project Setup
 
