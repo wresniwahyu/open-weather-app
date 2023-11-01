@@ -46,7 +46,7 @@ class HomeWeatherViewModel @Inject constructor(
         }
     }
 
-    private fun getWeatherData(name: String) {
+    fun getWeatherData(name: String) {
         viewModelScope.launch {
             _state.update { state -> state.copy(isWeatherLoading = true) }
             repository.getWeatherData(
@@ -107,7 +107,8 @@ class HomeWeatherViewModel @Inject constructor(
                         date = item.dt.formatDate(),
                         humidity = item.main.humidity,
                         temp = item.main.temp,
-                        wind = item.wind.speed
+                        wind = item.wind.speed,
+                        icon = item.weather.icon
                     )
                 }
             )

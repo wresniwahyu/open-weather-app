@@ -38,7 +38,8 @@ fun ForecastBs(
                             date = item.date,
                             humidity = item.humidity,
                             wind = item.wind,
-                            temp = item.temp
+                            temp = item.temp,
+                            icon = item.icon
                         )
                     )
                 }

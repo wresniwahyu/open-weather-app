@@ -13,9 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.weather.app.R
 
 @Composable
 fun ForecastItem(
@@ -47,7 +49,7 @@ fun ForecastItem(
             AsyncImage(
                 modifier = Modifier
                     .defaultMinSize(50.dp, 50.dp),
-                model = "https://openweathermap.org/img/wn/10d@2x.png",
+                model = stringResource(R.string.format_icon_url, data.icon),
                 contentScale = ContentScale.Inside,
                 contentDescription = null,
             )
@@ -63,7 +65,8 @@ data class ForecastItemData(
     val date: String,
     val humidity: Int,
     val wind: Double,
-    val temp: Double
+    val temp: Double,
+    val icon: String
 )
 
 @Preview(showBackground = true)
@@ -74,7 +77,8 @@ fun ForecastItemPrev() {
             date = "Monday 24-Jan-2024 10:00",
             humidity = 41,
             wind = 5.81,
-            temp = 32.0
+            temp = 32.0,
+            icon = "10d"
         )
     )
 }
