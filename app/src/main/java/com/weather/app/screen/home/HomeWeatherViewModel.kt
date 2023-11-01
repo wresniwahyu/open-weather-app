@@ -42,7 +42,6 @@ class HomeWeatherViewModel @Inject constructor(
                 delay(1000)
                 getWeatherData(name = name)
                 getForecastData(name = name)
-                getFavorites()
             }
         }
     }
@@ -68,6 +67,7 @@ class HomeWeatherViewModel @Inject constructor(
                         )
                     )
                 }
+                getFavorites()
             }.onError { _, _, message, _ ->
                 _state.update { state -> state.copy(isWeatherLoading = false) }
                 _event.emit(Event.ShowNetworkError(message.orEmpty()))
