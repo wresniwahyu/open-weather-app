@@ -4,11 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.weather.app.base.BaseViewModel
 import com.weather.app.data.WeatherRepository
 import com.weather.app.data.model.FavoriteWeatherUiModel
-import com.weather.app.data.model.ForecastItemUiModel
 import com.weather.app.di.IoDispatcher
-import com.weather.app.ui.component.ForecastGroupItemData
 import com.weather.app.ui.component.ForecastItemData
-import com.weather.app.util.formatDate
 import com.weather.app.util.onError
 import com.weather.app.util.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,43 +72,20 @@ class HomeWeatherViewModel @Inject constructor(
         }
     }
 
-    private fun getForecastData(name: String) {
+    fun getForecastData(name: String) {
         viewModelScope.launch {
             _state.update { state -> state.copy(isForecastLoading = true) }
             repository.getForecastData(cityName = name).onSuccess {
                 _state.update { state ->
                     _state.update { state -> state.copy(isForecastLoading = false) }
                     state.copy(
-                        groupedForecasts = it.list.groupByDate()
+                        groupedForecasts = it.getForecastGroupedByDate()
                     )
                 }
             }.onError { _, _, message, _ ->
                 _state.update { state -> state.copy(isForecastLoading = false) }
                 _event.emit(Event.ShowNetworkError(message.orEmpty()))
             }
-        }
-    }
-
-    private fun List<ForecastItemUiModel>.groupByDate(): List<HomeGroupedForecastData> {
-        return this.groupBy {
-            it.dt.formatDate()
-        }.map { (date, items) ->
-            HomeGroupedForecastData(
-                group = ForecastGroupItemData(
-                    date = date,
-                    minTemp = items.minByOrNull { it.main.temp }?.main?.temp ?: 0.0,
-                    maxTemp = items.maxByOrNull { it.main.temp }?.main?.temp ?: 0.0
-                ),
-                groupItems = items.map { item ->
-                    ForecastItemData(
-                        date = item.dt.formatDate(),
-                        humidity = item.main.humidity,
-                        temp = item.main.temp,
-                        wind = item.wind.speed,
-                        icon = item.weather.icon
-                    )
-                }
-            )
         }
     }
 
@@ -134,7 +108,7 @@ class HomeWeatherViewModel @Inject constructor(
         }
     }
 
-    private fun getFavorites() {
+    fun getFavorites() {
         viewModelScope.launch {
             repository.getFavorites()
                 .catch {
