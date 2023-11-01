@@ -1,6 +1,5 @@
 package com.weather.app.screen.home
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.weather.app.base.BaseViewModel
 import com.weather.app.data.WeatherRepository
@@ -50,9 +49,11 @@ class HomeWeatherViewModel @Inject constructor(
 
     private fun getWeatherData(name: String) {
         viewModelScope.launch {
+            _state.update { state -> state.copy(isWeatherLoading = true) }
             repository.getWeatherData(
                 cityName = name
             ).onSuccess {
+                _state.update { state -> state.copy(isWeatherLoading = false) }
                 _state.update { state ->
                     state.copy(
                         data = HomeWeatherScreenData(
@@ -67,20 +68,26 @@ class HomeWeatherViewModel @Inject constructor(
                         )
                     )
                 }
+            }.onError { _, _, message, _ ->
+                _state.update { state -> state.copy(isWeatherLoading = false) }
+                _event.emit(Event.ShowNetworkError(message.orEmpty()))
             }
         }
     }
 
     private fun getForecastData(name: String) {
         viewModelScope.launch {
+            _state.update { state -> state.copy(isForecastLoading = true) }
             repository.getForecastData(cityName = name).onSuccess {
                 _state.update { state ->
+                    _state.update { state -> state.copy(isForecastLoading = false) }
                     state.copy(
                         groupedForecasts = it.list.groupByDate()
                     )
                 }
-            }.onError { e, code, message, error ->
-                Log.e("e", e?.message.orEmpty())
+            }.onError { _, _, message, _ ->
+                _state.update { state -> state.copy(isForecastLoading = false) }
+                _event.emit(Event.ShowNetworkError(message.orEmpty()))
             }
         }
     }
@@ -130,7 +137,7 @@ class HomeWeatherViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getFavorites()
                 .catch {
-                    // do something
+                    _event.emit(Event.ShowMessageToast(it.message.orEmpty()))
                 }
                 .collectLatest {
                     _state.update { state ->
@@ -159,6 +166,8 @@ class HomeWeatherViewModel @Inject constructor(
             wind = 0.0
         ),
         isFavorite = false,
+        isWeatherLoading = false,
+        isForecastLoading = false,
         groupedForecasts = listOf(),
         selectedForecastGroupItems = listOf(),
         favorites = listOf()
@@ -167,7 +176,8 @@ class HomeWeatherViewModel @Inject constructor(
     override fun onEvent(event: Event) {
         viewModelScope.launch(dispatcherIo) {
             when (event) {
-                is Event.ShowError -> _event.emit(Event.ShowError(event.throwable))
+                is Event.ShowNetworkError -> _event.emit(Event.ShowNetworkError(event.message))
+                is Event.ShowMessageToast -> _event.emit(Event.ShowMessageToast(event.message))
             }
         }
     }
@@ -175,13 +185,16 @@ class HomeWeatherViewModel @Inject constructor(
     data class State(
         val data: HomeWeatherScreenData,
         val isFavorite: Boolean,
+        val isWeatherLoading: Boolean,
+        val isForecastLoading: Boolean,
         val groupedForecasts: List<HomeGroupedForecastData>,
         val selectedForecastGroupItems: List<ForecastItemData>,
         val favorites: List<FavoriteWeatherUiModel>
     )
 
     sealed class Event {
-        class ShowError(val throwable: Throwable) : Event()
+        class ShowNetworkError(val message: String = "") : Event()
+        class ShowMessageToast(val message: String = "") : Event()
     }
 
 }

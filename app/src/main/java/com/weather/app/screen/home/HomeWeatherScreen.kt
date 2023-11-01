@@ -29,6 +29,7 @@ import com.weather.app.ui.component.EmptyState
 import com.weather.app.ui.component.FavoritesBs
 import com.weather.app.ui.component.ForecastBs
 import com.weather.app.ui.component.ForecastGroupItem
+import com.weather.app.ui.component.LoadingState
 import com.weather.app.ui.component.SearchBar
 import com.weather.app.util.isNetworkAvailable
 import com.weather.app.util.showToast
@@ -40,13 +41,25 @@ fun HomeWeatherScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     var showNetworkNotAvailable by remember { mutableStateOf(false) }
+    var showErrorState by remember { mutableStateOf(false) }
+    var errorStateMessage by remember { mutableStateOf("") }
     var searchValue by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = Unit, block = {
         viewModel.event.collect { event ->
             when (event) {
-                is HomeWeatherViewModel.Event.ShowError -> {
-                    context.showToast(context.getString(R.string.error_message))
+                is HomeWeatherViewModel.Event.ShowNetworkError -> {
+                    val message =
+                        event.message.ifEmpty { context.getString(R.string.error_message) }
+                    context.showToast(message)
+                    errorStateMessage = message
+                    showErrorState = true
+                }
+
+                is HomeWeatherViewModel.Event.ShowMessageToast -> {
+                    val message =
+                        event.message.ifEmpty { context.getString(R.string.error_message) }
+                    context.showToast(message)
                 }
             }
         }
@@ -73,7 +86,23 @@ fun HomeWeatherScreen(
             if (state.data.cityName.isNotBlank()) {
                 HomeWeatherContent(viewModel = viewModel)
             } else {
-                EmptyState(text = stringResource(R.string.message_search_city))
+                LoadingState(isLoading = state.isWeatherLoading)
+
+                if (showErrorState) {
+                    EmptyState(
+                        text = errorStateMessage,
+                        buttonText = stringResource(id = R.string.btn_try_again)
+                    ) {
+                        if (searchValue.isNotBlank()) {
+                            viewModel.searchByName(searchValue)
+                        }
+                        showErrorState = false
+                    }
+                }
+
+                if (!state.isWeatherLoading && showErrorState.not()) {
+                    EmptyState(text = stringResource(R.string.message_search_city))
+                }
             }
         }
     }
@@ -101,7 +130,8 @@ fun HomeWeatherContent(
         FavoritesBs(
             items = state.favorites,
             onItemClicked = {
-                // do something
+                viewModel.searchByName(it.name)
+                showFavoritesBs = false
             },
             onDismiss = {
                 showFavoritesBs = false
@@ -158,15 +188,24 @@ fun HomeWeatherContent(
             Spacer(modifier = Modifier.width(16.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
-        LazyColumn {
-            items(state.groupedForecasts) {
-                ForecastGroupItem(
-                    data = it.group,
-                    onClick = {
-                        viewModel.selectForecastItem(it.groupItems)
-                        showForecastBs = true
-                    }
-                )
+
+        val grouped = state.groupedForecasts
+        if (grouped.isEmpty()) {
+            LoadingState(
+                modifier = modifier.weight(1f),
+                isLoading = state.isForecastLoading
+            )
+        } else {
+            LazyColumn {
+                items(state.groupedForecasts) {
+                    ForecastGroupItem(
+                        data = it.group,
+                        onClick = {
+                            viewModel.selectForecastItem(it.groupItems)
+                            showForecastBs = true
+                        }
+                    )
+                }
             }
         }
 

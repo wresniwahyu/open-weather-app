@@ -14,7 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.weather.app.R
 import com.weather.app.data.model.FavoriteWeatherUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +48,7 @@ fun FavoritesBs(
                 }
             }
         } else {
-            Text(text = "Empty Data")
+            Text(text = stringResource(R.string.favorite_is_empty))
         }
         Spacer(modifier = modifier.height(50.dp))
     }

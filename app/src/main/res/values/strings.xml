@@ -8,4 +8,6 @@
     <string name="btn_try_again">Try Again</string>
     <string name="error_message">Something went wrong!</string>
     <string name="message_search_city">Search City To See the Weather</string>
+    <string name="favorite_is_empty">Favorite is Empty</string>
+    <string name="no_forecast_data">No Forecast Data</string>
 </resources>

@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.weather.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +44,7 @@ fun ForecastBs(
                 }
             }
         } else {
-            Text(text = "Empty Data")
+            Text(text = stringResource(R.string.no_forecast_data))
         }
         Spacer(modifier = modifier.height(50.dp))
     }
